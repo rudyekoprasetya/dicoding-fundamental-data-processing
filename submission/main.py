@@ -1,5 +1,4 @@
-from utils import transform_data
-from utils import scrape_data
+from utils import transform_data, scrape_data, load_to_csv
 import pandas as pd
 
 def main():
@@ -14,7 +13,10 @@ def main():
     #sesudah di transform
     clean_data = pd.DataFrame(transform_data(df))
     print(clean_data.head())
-    print(clean_data.info())
+    print(clean_data.info()) 
+
+    # load to CSV
+    load_to_csv(clean_data)
 
 if __name__ == '__main__':
      main()

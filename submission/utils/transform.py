@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def clean_price(s):
+def clean_price(s): # untuk clean kolom price
     try:
         s = s.replace("Price Unavailable", np.nan)
         s = s.astype(str).str.replace("$","",regex=False).str.replace(",","",regex=False)
@@ -9,33 +9,33 @@ def clean_price(s):
     except Exception:
         return pd.to_numeric(pd.Series([np.nan]*len(s)), errors="coerce")
 
-def clean_rating(s):
+def clean_rating(s): # untuk clean kolom rating
     try:
         num = s.str.extract(r"(\d+\.?\d*)")[0]
         return pd.to_numeric(num, errors="coerce")
     except Exception:
         return pd.to_numeric(pd.Series([np.nan]*len(s)), errors="coerce")
 
-def clean_colors(s):
+def clean_colors(s): # untuk clean kolom colors
     try:
         num = s.str.extract(r"(\d+)")[0]
         return pd.to_numeric(num, errors="coerce").fillna(0).astype(int)
     except Exception:
         return pd.Series([0]*len(s), dtype=int)
 
-def clean_size(s):
+def clean_size(s): # untuk clean kolom size
     try:
         return s.str.replace("Size:","",regex=False).str.strip()
     except Exception:
         return pd.Series(["Unknown"]*len(s), dtype="object")
 
-def clean_gender(s):
+def clean_gender(s): # untuk clean kolom gender
     try:
         return s.str.replace("Gender:","",regex=False).str.strip()
     except Exception:
         return pd.Series(["Unknown"]*len(s), dtype="object")
 
-def transform_data(raw):
+def transform_data(raw): # fungsi utama transformasi data
     try:
         df = pd.DataFrame(raw)
         df = df[df["Title"] != "Unknown Product"].reset_index(drop=True)
@@ -50,6 +50,7 @@ def transform_data(raw):
         df = df.dropna()
         df = df.drop_duplicates().reset_index(drop=True)
         df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+        # konversi sesuai dengan type data yang diinginkan
         df = df.astype({"Price":"float64","Rating":"float64","Colors":"int64","Size":"object","Gender":"object"})
         return df
     except Exception:

@@ -55,41 +55,33 @@ def extract_data(product):
  
  
 def scrape_data(base_url, start_page=1, delay=2):
-   #Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data.
-    data = []
-    page_number = start_page
- 
-    while True:
-        url = base_url.format(page_number)
-        print(f"Scraping halaman: {url}")
- 
-        content = fetching_content(url)
-        if content:
-            soup = BeautifulSoup(content, "html.parser")
-            products_element = soup.find_all('div', class_='collection_card')
-            for product in products_element:
-                book = extract_data(product)
-                data.append(book)
- 
-            next_button = soup.find('li', class_='page-item next')
-            if next_button:
-                page_number += 1
-                time.sleep(delay) # Delay sebelum halaman berikutnya
+    try:
+        #Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data.
+        data = []
+        page_number = start_page
+    
+        while True:
+            url = base_url.format(page_number)
+            print(f"Scraping halaman: {url}")
+    
+            content = fetching_content(url)
+            if content:
+                soup = BeautifulSoup(content, "html.parser")
+                products_element = soup.find_all('div', class_='collection_card')
+                for product in products_element:
+                    book = extract_data(product)
+                    data.append(book)
+    
+                next_button = soup.find('li', class_='page-item next')
+                if next_button:
+                    page_number += 1
+                    time.sleep(delay) # Delay sebelum halaman berikutnya
+                else:
+                    break # Berhenti jika sudah tidak ada next button
             else:
-                break # Berhenti jika sudah tidak ada next button
-        else:
-            break # Berhenti jika ada kesalahan
- 
-    return data
-
-# def main():
-#     #Fungsi utama untuk keseluruhan proses scraping hingga menyimpannya
-#     BASE_URL = 'https://fashion-studio.dicoding.dev/'
-#     all_data = scrape_data(BASE_URL)
-#     df = pd.DataFrame(all_data)
-#     print(df)
- 
- 
-# if __name__ == '__main__':
-#     main()
+                break # Berhenti jika ada kesalahan
+    
+        return data
+    except Exception as e:
+        print(f"An Error Occured During Scraping Data : {e}")
  

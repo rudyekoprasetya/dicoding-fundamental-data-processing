@@ -58,7 +58,7 @@ def extract_data(product):
     except Exception as e:
         print(f"An error occurred to save dataframe : {e}") 
  
-def scrape_data(base_url, start_page=1, delay=1):
+def scrape_data(base_url, start_page=1, delay=0.5):
     try:
         #Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data.
         data = []

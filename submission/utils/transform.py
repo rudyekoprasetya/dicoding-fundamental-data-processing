@@ -1,35 +1,56 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
 
-def transform_data(df):
+def clean_price(s):
     try:
-        # copy data sebelum di transform 
-        df_transformed = df.copy()
+        s = s.replace("Price Unavailable", np.nan)
+        s = s.astype(str).str.replace("$","",regex=False).str.replace(",","",regex=False)
+        return pd.to_numeric(s, errors="coerce") * 16000
+    except Exception:
+        return pd.to_numeric(pd.Series([np.nan]*len(s)), errors="coerce")
 
-        # isi data yang kosong atau tidak sesuai
-        df_transformed = df_transformed.assign(
-            Title=df_transformed['Title'].fillna('Unknown Product'),
-            Rating=df_transformed['Rating'].fillna('Invalid Rating'),
-            Price=df_transformed['Price'].fillna(0),
-            Size=df_transformed['Size'].fillna('Not Specified')
-        )
+def clean_rating(s):
+    try:
+        num = s.str.extract(r"(\d+\.?\d*)")[0]
+        return pd.to_numeric(num, errors="coerce")
+    except Exception:
+        return pd.to_numeric(pd.Series([np.nan]*len(s)), errors="coerce")
 
-        #transformasi untuk kolom price
-        df_transformed['Price'] = df_transformed['Price'].replace('Price Unavailable',0)
-        df_transformed['Price'] = df_transformed['Price'].astype(np.float64) # konversi ke float64
-        df_transformed.loc[df_transformed['Price'] < 0, 'Price'] = 0 # ubah nilai negatif ke 0
-        df_transformed['Price'] = df_transformed['Price']*16000 # jadikan rupiah
+def clean_colors(s):
+    try:
+        num = s.str.extract(r"(\d+)")[0]
+        return pd.to_numeric(num, errors="coerce").fillna(0).astype(int)
+    except Exception:
+        return pd.Series([0]*len(s), dtype=int)
 
-        # transformasi kolom rating
-        df_transformed['Rating'] = df_transformed['Rating'].replace('Invalid Rating',0)
-        df_transformed['Rating'] = df_transformed['Rating'].replace('Not Rated',0)
-        df_transformed['Rating'] = df_transformed['Rating'].round().astype(np.int64)
+def clean_size(s):
+    try:
+        return s.str.replace("Size:","",regex=False).str.strip()
+    except Exception:
+        return pd.Series(["Unknown"]*len(s), dtype="object")
 
-        # transformasi untuk kolom Colors
-        df_transformed['Colors'] = df_transformed['Colors'].astype(np.int64)
+def clean_gender(s):
+    try:
+        return s.str.replace("Gender:","",regex=False).str.strip()
+    except Exception:
+        return pd.Series(["Unknown"]*len(s), dtype="object")
 
-        return df_transformed
-
-    except Exception as e:
-        print(f"An error occurred during transform data : {e}")
+def transform_data(raw):
+    try:
+        df = pd.DataFrame(raw)
+        df = df[df["Title"] != "Unknown Product"].reset_index(drop=True)
+        if df.empty:
+            return df
+        df["Price"]  = clean_price(df["Price"])
+        df["Rating"] = clean_rating(df["Rating"])
+        df["Colors"] = clean_colors(df["Colors"])
+        df["Size"]   = clean_size(df["Size"])
+        df["Gender"] = clean_gender(df["Gender"])
+        df = df[df["Title"] != "Unknown Product"]
+        df = df.dropna()
+        df = df.drop_duplicates().reset_index(drop=True)
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+        df = df.astype({"Price":"float64","Rating":"float64","Colors":"int64","Size":"object","Gender":"object"})
+        return df
+    except Exception:
+        return pd.DataFrame(columns=["Title","Price","Rating","Colors","Size","Gender","Timestamp"])

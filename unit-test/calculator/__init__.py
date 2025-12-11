@@ -1,1 +1,1 @@
-from calculations import get_numbers, addition, subtraction, multiplication, division
+from calculator.calculations import get_numbers, addition, subtraction, multiplication, division

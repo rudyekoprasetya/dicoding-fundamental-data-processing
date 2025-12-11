@@ -1,6 +1,5 @@
 import time
- 
-import pandas as pd
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
  
@@ -13,7 +12,7 @@ HEADERS = {
  
  
 def fetching_content(url):
-    """Mengambil konten HTML dari URL yang diberikan."""
+    #Mengambil konten HTML dari URL yang diberikan
     session = requests.Session()
     response = session.get(url, headers=HEADERS)
     try:
@@ -24,28 +23,39 @@ def fetching_content(url):
         return None
  
  
-def extract_book_data(article):
-    book_title = article.find('h3').text
-    product_element = article.find('div', class_='product_price')
-    price = product_element.find('p', class_='price_color').text
-    availability_element = product_element.find('p', class_='instock availability')
-    available = "Available" if availability_element else "Not Available"
+def extract_data(product):
+    time_stamp = datetime.now() 
+    product_detail_element=product.find('div', class_='product-details')
+    title = product_detail_element.find('h3', class_='product-title').text
+    product_element = product_detail_element.find('div', class_='price_countainer')
+    price_usd = product_element.find('span', class_='price').text
+   
+
+    details = product_detail_element.find_all('p')
+    rating_text = details[0].text.strip()
+    rating = float(rating_text.split("⭐")[1].split("/")[0].strip()) if "⭐" in rating_text else None
+    
+    colors = int(details[1].text.strip().split()[0])
+    size = details[2].text.strip().split(":")[1].strip()
+    gender = details[3].text.strip().split(":")[1].strip()
  
-    rating_element = article.find('p', class_='star-rating')
-    rating = rating_element['class'][1] if rating_element else "Rating not found"
+    
  
-    books = {
-        "Title": book_title,
-        "Price": price,
-        "Availability": available,
-        "Rating": rating
+    list_product = {
+        "Title": title,
+        "Price": price_usd,
+        "Rating": rating,
+        "Colors":colors,
+        "Size":size,
+        "Gender":gender,
+        "Timestamp":time_stamp
     }
  
-    return books
+    return list_product
  
  
-def scrape_book(base_url, start_page=1, delay=2):
-    """Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data."""
+def scrape_data(base_url, start_page=1, delay=2):
+   #Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data.
     data = []
     page_number = start_page
  
@@ -56,12 +66,12 @@ def scrape_book(base_url, start_page=1, delay=2):
         content = fetching_content(url)
         if content:
             soup = BeautifulSoup(content, "html.parser")
-            articles_element = soup.find_all('article', class_='product_pod')
-            for article in articles_element:
-                book = extract_book_data(article)
+            products_element = soup.find_all('div', class_='collection_card')
+            for product in products_element:
+                book = extract_data(product)
                 data.append(book)
  
-            next_button = soup.find('li', class_='next')
+            next_button = soup.find('li', class_='page-item next')
             if next_button:
                 page_number += 1
                 time.sleep(delay) # Delay sebelum halaman berikutnya
@@ -71,5 +81,15 @@ def scrape_book(base_url, start_page=1, delay=2):
             break # Berhenti jika ada kesalahan
  
     return data
+
+# def main():
+#     #Fungsi utama untuk keseluruhan proses scraping hingga menyimpannya
+#     BASE_URL = 'https://fashion-studio.dicoding.dev/'
+#     all_data = scrape_data(BASE_URL)
+#     df = pd.DataFrame(all_data)
+#     print(df)
  
+ 
+# if __name__ == '__main__':
+#     main()
  

@@ -1,11 +1,20 @@
-from utils.extract import scrape_data
+from utils import transform_data
+from utils import scrape_data
 import pandas as pd
 
 def main():
-    BASE_URL = 'https://fashion-studio.dicoding.dev/'
+    BASE_URL = 'https://fashion-studio.dicoding.dev/page{}'
     all_data = scrape_data(BASE_URL)
     df = pd.DataFrame(all_data)
-    print(df)
+
+    # sebelum di transform
+    print(df.head())
+    print(df.info())
+
+    #sesudah di transform
+    clean_data = pd.DataFrame(transform_data(df))
+    print(clean_data.head())
+    print(clean_data.info())
 
 if __name__ == '__main__':
      main()

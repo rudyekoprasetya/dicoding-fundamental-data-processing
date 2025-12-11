@@ -24,53 +24,60 @@ def fetching_content(url):
  
  
 def extract_data(product):
-    time_stamp = datetime.now() 
-    product_detail_element=product.find('div', class_='product-details')
-    title = product_detail_element.find('h3', class_='product-title').text
-    product_element = product_detail_element.find('div', class_='price_countainer')
-    price_usd = product_element.find('span', class_='price').text
-   
+    try:
+        time_stamp = datetime.now() 
+        t = product.find("h3", class_="product-title")
+        title = t.get_text(strip=True) if t else "Unknown Product"
+        p = product.find("span", class_="price") or product.find("p", class_="price")
+        price = p.get_text(strip=True) if p else "Price Unavailable"
+        price_usd = price.replace("$", "").strip()
+        details = product.find_all("p", style=lambda v: v and "font-size: 14px" in v)
+        rating = colors = size = gender = None
+        for x in details:
+            text = x.get_text(strip=True)
+            if text.startswith("Rating:"):
+                rating = text.replace("Rating:", "").replace("⭐","").replace(" / 5","").strip()
+            elif "Colors" in text:
+                colors = text.replace("Colors", "").strip()
+            elif text.startswith("Size:"):
+                size = text.replace("Size: ","").strip()
+            elif text.startswith("Gender:"):
+                gender =  text.replace("Gender: ","").strip()
 
-    details = product_detail_element.find_all('p')
-    rating_text = details[0].text.strip()
-    rating = float(rating_text.split("⭐")[1].split("/")[0].strip()) if "⭐" in rating_text else None
+        list_product = {
+            "Title": title,
+            "Price": price_usd,
+            "Rating": rating,
+            "Colors":colors,
+            "Size":size,
+            "Gender":gender,
+            "Timestamp":time_stamp
+        }
     
-    colors = int(details[1].text.strip().split()[0])
-    size = details[2].text.strip().split(":")[1].strip()
-    gender = details[3].text.strip().split(":")[1].strip()
+        return list_product
+    except Exception as e:
+        print(f"An error occurred to save dataframe : {e}") 
  
-    
- 
-    list_product = {
-        "Title": title,
-        "Price": price_usd,
-        "Rating": rating,
-        "Colors":colors,
-        "Size":size,
-        "Gender":gender,
-        "Timestamp":time_stamp
-    }
- 
-    return list_product
- 
- 
-def scrape_data(base_url, start_page=1, delay=2):
+def scrape_data(base_url, start_page=1, delay=1):
     try:
         #Fungsi utama untuk mengambil keseluruhan data, mulai dari requests hingga menyimpannya dalam variabel data.
         data = []
         page_number = start_page
     
         while True:
-            url = base_url.format(page_number)
+            if (page_number==1):
+                url = 'https://fashion-studio.dicoding.dev/'
+            else:
+                url = base_url.format(page_number)
             print(f"Scraping halaman: {url}")
     
             content = fetching_content(url)
             if content:
                 soup = BeautifulSoup(content, "html.parser")
-                products_element = soup.find_all('div', class_='collection_card')
+                products_element = soup.find_all('div', class_='collection-card')
                 for product in products_element:
-                    book = extract_data(product)
-                    data.append(book)
+                    product_data = extract_data(product)
+                    data.append(product_data)
     
                 next_button = soup.find('li', class_='page-item next')
                 if next_button:

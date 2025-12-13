@@ -1,0 +1,36 @@
+## Cara menjalankan ETL pipeline
+## ------------------------------
+
+1. Virtual enviroment
+```bash
+
+py -m venv .env
+
+source .env/Scripts/activate
+
+
+```
+
+
+2. Install dependencies
+```bash
+
+pip install -r requirements.txt
+
+```
+
+
+
+3. Jalankan ETL pipelines
+```bash
+
+py main.py
+
+```
+
+4. jalankan semua unit test dan coverage
+```bash
+
+py -m pytest tests/ -v --cov --cov-report=html
+
+```

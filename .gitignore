@@ -1,3 +1,5 @@
 .env
 submission/*.csv
 submission/*.json
+submission/utils/__pycache__/
+*.py[cod]

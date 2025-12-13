@@ -79,22 +79,22 @@ class TestExtractionFunctions(unittest.TestCase):
         # HTML tiruan (Mock HTML) untuk produk lengkap
         html_product = """
         <div class="collection-card">
-            <h3 class="product-title">T-Shirt Keren Terbaru</h3>
+            <h3 class="product-title">Kaos Keren Terbaru</h3>
             <span class="price">$19.99</span>
             <p style="font-size: 14px">Rating: 4.5 ⭐ / 5</p>
-            <p style="font-size: 14px">Colors: Black, White, Red</p>
-            <p style="font-size: 14px">Size: S, M, L</p>
+            <p style="font-size: 14px">5 Colors</p>
+            <p style="font-size: 14px">Size: S</p>
             <p style="font-size: 14px">Gender: Unisex</p>
         </div>
         """
         mock_product = BeautifulSoup(html_product, "html.parser").find('div')
 
         expected_data = {
-            "Title": "T-Shirt Keren Terbaru",
+            "Title": "Kaos Keren Terbaru",
             "Price": "19.99",
             "Rating": "4.5",
-            "Colors": "Black, White, Red",
-            "Size": "S, M, L",
+            "Colors": "5",
+            "Size": "S",
             "Gender": "Unisex",
             "Timestamp": mock_now
         }

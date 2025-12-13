@@ -1,4 +1,4 @@
-from utils import transform_data, scrape_data, load_to_csv
+from utils import transform_data, scrape_data, load_to_csv, load_to_spreadsheet
 import pandas as pd
 
 def main():
@@ -17,6 +17,9 @@ def main():
 
     # load to CSV
     load_to_csv(clean_data)
+
+    #load to spreadsheet
+    load_to_spreadsheet(clean_data)
 
 if __name__ == '__main__':
      main()

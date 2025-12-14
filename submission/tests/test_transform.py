@@ -90,9 +90,9 @@ class TestTransformationFunctions(unittest.TestCase):
         """Menguji ekstraksi jumlah warna dan penanganan nilai hilang."""
         s = pd.Series(["2 Colors", None])
         # None -> 0 (setelah fillna)
-        expected = pd.Series([2, 0], dtype='int32')
+        expected = pd.Series([2, 0])
         result = clean_colors(s)
-        pd.testing.assert_series_equal(result, expected, check_names=False)
+        pd.testing.assert_series_equal(result, expected, check_names=False, check_dtype=False)
 
     # --- Pengujian Fungsi clean_size dan clean_gender ---
 

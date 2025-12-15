@@ -1,36 +1,42 @@
 ## Cara menjalankan ETL pipeline
 ## ------------------------------
 
-1. Virtual enviroment
+#1. Virtual enviroment
 ```bash
 
 py -m venv .env
 
 source .env/Scripts/activate
 
-
 ```
 
-
-2. Install dependencies
+#2. Install dependencies
 ```bash
 
 pip install -r requirements.txt
 
 ```
 
-
-
-3. Jalankan ETL pipelines
+#3. Jalankan ETL pipelines
 ```bash
 
 py main.py
 
 ```
 
-4. jalankan semua unit test dan coverage
+#4. jalankan semua unit test 
 ```bash
 
 py -m pytest tests/ -v --cov --cov-report=html
 
 ```
+
+#5. jalankan coverage pada folder test
+```bash
+
+coverage run -m pytest tests
+
+```
+
+#5. link Google Sheet
+https://docs.google.com/spreadsheets/d/1tDsvSwXu5q9F6TaggFsK4fje4FX0iMNRfIs1I859EGg/edit?usp=sharing

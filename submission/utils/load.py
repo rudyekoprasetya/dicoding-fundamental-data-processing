@@ -1,3 +1,5 @@
+import gspread
+import pandas as pd
 
 def load_to_csv(df, path="products.csv"):
     try:
@@ -6,8 +8,6 @@ def load_to_csv(df, path="products.csv"):
         print(f"An erro occurred an save to CSV : {e}")
 
 def load_to_spreadsheet(df):
-	import gspread
-	import pandas as pd
 	try :
 		# 1. Autentikasi dengan file JSON
 		gc = gspread.service_account(filename='highmaps-157309-95f84e1a26b5.json')
